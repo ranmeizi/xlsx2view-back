@@ -1,20 +1,14 @@
 'use strict';
 
 const Controller = require('egg').Controller;
-// const fs = require('fs');
-// const path = require('path');
 
 class AnalyserController extends Controller {
   async uploadXLSX() {
     const { ctx } = this;
-    // ctx中取得文件
+    // ctx中获取流
     const stream = await ctx.getFileStream();
-    console.log(stream);
-    // const { file } = ctx.req;
-    // const { batchNum } = ctx.req.body;
-    // console.log(batchNum);
-    // console.log(file);
-    ctx.body = 1;
+    // 交给service处理
+    ctx.service.analyser.getWorkbook(stream);
   }
 }
 

@@ -22,7 +22,7 @@ module.exports = appInfo => {
   config.security = {
     csrf: {
       enable: false,
-      ignoreJSON: true,
+      ignoreJSON: false,
     },
     domainWhiteList: [ 'http://localhost:8080' ],
   };
@@ -32,6 +32,11 @@ module.exports = appInfo => {
   config.cors = {
     origin: '*',
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+  };
+
+  // 设置multipart的后缀格式
+  config.multipart = {
+    fileExtensions: [ '.xls', '.xlsx', '.xlsm' ],
   };
 
   return {
