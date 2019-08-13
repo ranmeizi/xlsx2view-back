@@ -3,7 +3,6 @@
 const Controller = require('egg').Controller;
 
 class AnalyserController extends Controller {
-
   // 上传excel
   async uploadXLSX() {
     try {
@@ -20,7 +19,10 @@ class AnalyserController extends Controller {
       const dataTable = await ctx.service.analyser.dataParser(sheet1);
 
       // getSqlList
-      const sqlList = await ctx.service.analyser.getSql(dataTable, stream.fields.batchNum);
+      const sqlList = await ctx.service.analyser.getSql(
+        dataTable,
+        stream.fields.batchNum
+      );
 
       // 执行SQL语句
       sqlList.forEach(sql => {
@@ -36,16 +38,22 @@ class AnalyserController extends Controller {
   // 分页查询
   async selectLimit() {
     try {
-      // 取数据
-      console.log(this.ctx.request.body)
-      let { pageSize, startTime, endTime, pageNum, batchNum } = this.ctx.request.body
-      let select = `SELECT * FROM ticket_xls WHERE order_date BETWEEN '${startTime}' and '${endTime}'`
-      let batch = batchNum ? ` and batch='${batch}'` : ''
-      let limit = ` limit ${(pageNum - 1) * pageSize},${pageSize}`
-      let sql = select + batch + limit
-      console.log(await this.app.mysql.query(sql));
-    } catch (e) {
+      // 根据筛选条件查询数据库
+      let { list, count } = await this.ctx.service.analyser.pageSelect();
+      count = count[0].CNT;
+      // 表头
+      const column = await this.ctx.service.analyser.getColumn(list);
 
+      this.ctx.body = {
+        success: true,
+        data: {
+          column,
+          list,
+          count,
+        },
+      };
+    } catch (e) {
+      console.log(e);
     }
   }
 }
