@@ -4,6 +4,7 @@ const Controller = require('egg').Controller;
 
 class AnalyserController extends Controller {
 
+  // 上传excel
   async uploadXLSX() {
     try {
       const { ctx } = this;
@@ -31,7 +32,21 @@ class AnalyserController extends Controller {
       console.log(err);
       this.ctx.body = this.ctx.service.response.index({ data: null, err });
     }
+  }
+  // 分页查询
+  async selectLimit() {
+    try {
+      // 取数据
+      console.log(this.ctx.request.body)
+      let { pageSize, startTime, endTime, pageNum, batchNum } = this.ctx.request.body
+      let select = `SELECT * FROM ticket_xls WHERE order_date BETWEEN '${startTime}' and '${endTime}'`
+      let batch = batchNum ? ` and batch='${batch}'` : ''
+      let limit = ` limit ${(pageNum - 1) * pageSize},${pageSize}`
+      let sql = select + batch + limit
+      console.log(await this.app.mysql.query(sql));
+    } catch (e) {
 
+    }
   }
 }
 
