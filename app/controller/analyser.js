@@ -43,13 +43,16 @@ class AnalyserController extends Controller {
       count = count[0].CNT;
       // 表头
       const column = await this.ctx.service.analyser.getColumn(list);
-
+      // batchs
+      let batchs = await this.ctx.service.analyser.getBatchs();
+      batchs = batchs.map(item => item.batch);
       this.ctx.body = {
         success: true,
         data: {
           column,
           list,
           count,
+          batchs,
         },
       };
     } catch (e) {

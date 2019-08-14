@@ -56,7 +56,7 @@ class AnalyserService extends Service {
       row.forEach((value, colIndex) => {
         obj[columnsArr[colIndex]] =
           dateColIndexs.indexOf(colIndex) >= 0
-            ? moment(dateParser(value)).format('YYYYMMDDHHmmss')
+            ? moment(dateParser(value)).format('YYYY-MM-DD HH:mm:ss')
             : value;
       });
       dataTable.push(obj);
@@ -95,13 +95,15 @@ class AnalyserService extends Service {
       startTime,
       endTime,
       pageNum,
-      batchNum,
+      batchs,
     } = this.ctx.request.body;
     const select = `SELECT * FROM ticket_xls WHERE order_date BETWEEN '${startTime}' and '${endTime}'`;
     const selectCount = `SELECT count(*) AS CNT FROM ticket_xls WHERE order_date BETWEEN '${startTime}' and '${endTime}'`;
-    const batch = batchNum ? ` and batch='${batchNum}'` : '';
+    const batch =
+      batchs.length > 0 ? ` and batch IN ('${batchs.join("','")}')` : '';
     const limit = ` limit ${(pageNum - 1) * pageSize},${pageSize}`;
     const sql = select + batch + limit;
+    console.log(sql);
     const rt = {
       list: await this.app.mysql.query(sql),
       count: await this.app.mysql.query(selectCount + batch),
@@ -117,11 +119,15 @@ class AnalyserService extends Service {
           column.push({
             title: reverseCol[key].key,
             dataIndex: key,
+            width: 'min-content',
           });
         }
       });
     }
     return column;
+  }
+  async getBatchs() {
+    return await this.app.mysql.query('SELECT batch FROM ticket_xls GROUP BY batch');
   }
 }
 
