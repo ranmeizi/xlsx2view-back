@@ -74,6 +74,54 @@ const columnMapper = {
   },
 };
 
+const COL_import_batch = {
+  batch: {
+    type: 'varchar',
+  },
+  game_date: {
+    type: 'varchar',
+  },
+  opposition: {
+    type: 'varchar',
+  },
+  weekday: {
+    type: 'varchar',
+  },
+  day_since_prev_game: {
+    type: 'int',
+  },
+  no_of_group: {
+    type: 'int',
+  },
+  gorup_adults: {
+    type: 'int',
+  },
+  group_children: {
+    type: 'int',
+  },
+  group_tickets_revenue: {
+    type: 'double',
+  },
+  eventbrite_add_ons: {
+    type: 'double',
+  },
+  group_add_one_food: {
+    type: 'double',
+  },
+  other_add_ons_food: {
+    type: 'double',
+  },
+  spare_comps_printed: {
+    type: 'int',
+  },
+  comparable_game_date: {
+    type: 'varchar',
+  },
+  import_time: {
+    type: 'varchar',
+  },
+};
+
 // 倒排value-key
 const reverseCol = {};
 const $keys = Object.keys(columnMapper);
@@ -87,3 +135,4 @@ for (let i = 0; i < $keys.length; i++) {
 
 exports.columnMapper = columnMapper;
 exports.reverseCol = reverseCol;
+exports.COL_import_batch = COL_import_batch;

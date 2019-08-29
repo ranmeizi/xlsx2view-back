@@ -1,14 +1,50 @@
 'use strict';
 
 const Controller = require('egg').Controller;
+const Response = require('../utils/response');
 
 class AnalyserController extends Controller {
-  // 上传excel
+  // 检查批次号是否重复
+  async repeatBatch() {
+    try {
+      const { ctx } = this;
+      // 取值
+      const { batch } = ctx;
+      const sql = `select * from import_batch where batch='${batch}'`;
+      const rc = await this.app.mysql.query(sql);
+
+      let repeat = false;
+      let msg = '成功';
+      const info = '';
+      if (rc.length > 0) {
+        // 有数据
+        repeat = true;
+        msg = 'Repeated batch number!!';
+      } else {
+        // 没数据
+        repeat = false;
+        msg = 'Batch number available';
+      }
+      this.ctx.body = new Response({
+        data: { repeat },
+        msg,
+        info,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  // 上传excel ----重写
   async uploadXLSX() {
     try {
       const { ctx } = this;
       // ctx中获取流
       const stream = await ctx.getFileStream();
+
+      // 添加bacth表数据
+      ctx.service.analyser.addBatch(stream.fields);
+
       // getWorkbook 将流转为json数据
       const workbook = await ctx.service.analyser.getWorkbook(stream);
 
