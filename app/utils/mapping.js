@@ -87,13 +87,13 @@ const COL_import_batch = {
   weekday: {
     type: 'varchar',
   },
-  day_since_prev_game: {
+  days_since_prev_game: {
     type: 'int',
   },
-  no_of_group: {
+  no_of_groups: {
     type: 'int',
   },
-  gorup_adults: {
+  group_adults: {
     type: 'int',
   },
   group_children: {
@@ -105,7 +105,7 @@ const COL_import_batch = {
   eventbrite_add_ons: {
     type: 'double',
   },
-  group_add_one_food: {
+  group_add_ons_food: {
     type: 'double',
   },
   other_add_ons_food: {

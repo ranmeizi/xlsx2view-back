@@ -16,6 +16,7 @@ class AnalyserService extends Service {
       v.push(value);
     });
     const sql = `INSERT INTO import_batch (${c.join(',')},import_time) VALUES (${v.join(',')},'${moment().format('YYYY-MM-DD HH:mm:ss')}')`;
+    console.log(sql);
     await this.app.mysql.query(sql);
   }
   // 使用流获取buffer数组
@@ -76,7 +77,7 @@ class AnalyserService extends Service {
     return dataTable.filter(item => Object.keys(item).length > 0);
   }
 
-  async getSql(xlsData, batchNum) {
+  async getSql(xlsData, batch) {
     // 拼接sql语句
     const sqlList = [];
     xlsData.forEach(item => {
@@ -91,7 +92,7 @@ class AnalyserService extends Service {
       const v = values.join(',');
 
       sqlList.push(
-        `INSERT INTO ticket_xls (${c},batch) VALUES (${v},'${batchNum}')`
+        `INSERT INTO ticket_xls (${c},batch) VALUES (${v},'${batch}')`
       );
     });
     return sqlList;

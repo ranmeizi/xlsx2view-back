@@ -57,7 +57,7 @@ class AnalyserController extends Controller {
       // getSqlList
       const sqlList = await ctx.service.analyser.getSql(
         dataTable,
-        stream.fields.batchNum
+        stream.fields.batch
       );
 
       // 执行SQL语句
@@ -65,10 +65,10 @@ class AnalyserController extends Controller {
         this.app.mysql.query(sql);
       });
 
-      this.ctx.body = this.ctx.service.response.index({ data: null, err: '' });
+      console.log('over');
+      this.ctx.body = await this.ctx.service.response.index({ data: null, err: '' });
     } catch (err) {
-      console.log(err);
-      this.ctx.body = this.ctx.service.response.index({ data: null, err });
+      this.ctx.body = await this.ctx.service.response.index({ data: null, err });
     }
   }
   // 分页查询
