@@ -669,10 +669,13 @@ const StatisticalTable = {
     type: 'int',
     round:0,
     formula: async (batchData, $QueryFn) => {
+      const baseFilter = `batch='${batchData.batch}'`;
       // 在这个时间之前↓
       const game_date = moment(batchData.game_date)
       // 找赛季开始时间 赛季是每年的8月到次年的5月
-      const season_start =game_date.month>5? moment(`${game_date,year()}-08`):moment(`${game_date,year()-1}-08`)
+      const season_start = game_date.month > 5 ? moment(`${game_date, year()}-08`) : moment(`${game_date, year() - 1}-08`)
+      // 选择用email区分，email不会重复，找出所有需要统计的email列表
+
       return null;
     },
   },
