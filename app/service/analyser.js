@@ -142,9 +142,7 @@ class AnalyserService extends Service {
   async getBatchs() {
     return await this.app.mysql.query('SELECT batch FROM ticket_xls GROUP BY batch');
   }
-  async hasTable(){
-    
-  }
+
 }
 
 module.exports = AnalyserService;
