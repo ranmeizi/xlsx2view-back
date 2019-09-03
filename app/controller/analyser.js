@@ -40,7 +40,7 @@ class AnalyserController extends Controller {
     try {
       const { ctx } = this;
       // ctx中获取流
-      const stream = await ctx.getFileStream();
+      const stream = await ctx.getFileStream({limits:{fields:20,fieldSize:5000000}});
 
       // 添加bacth表数据
       ctx.service.analyser.addBatch(stream.fields);
