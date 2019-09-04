@@ -11,15 +11,28 @@ class StatisticsService extends Service {
   async creatBatchStatistics(batch) {
     try {
       // 查询batch表信息，获得这场对阵额外数据
-      const rc = await this.app.mysql.query(`SELECT * FROM import_batch WHERE batch='${batch}'`);
+      const rc = await this.app.mysql.query(
+        `SELECT * FROM import_batch WHERE batch='${batch}'`
+      );
       const batchData = rc.length ? rc[0] : {};
       const statConfig = { ...StatisticalTable };
-      const statisticsData = {};
+      const statisticsData = { woshi: 'dashabi' };
       // 循环StatisticalTable，使用bind到statisticsData上的方法执行,传递一个查询方法，让他依次给statisticsData赋值
-      Object.values(statConfig).forEach(item => {
-        await item.formula.bind(statisticsData)(batchData, sql => this.app.mysql.query(sql));
+      Object.values(statConfig).forEach(async item => {
+        if (item.round === 0) {
+          await item.formula.bind(statisticsData)(batchData, sql =>
+            this.app.mysql.query(sql)
+          );
+        }
       });
-
+      Object.values(statConfig).forEach(async item => {
+        if (item.round === 1) {
+          await item.formula.bind(statisticsData)(batchData, sql =>
+            this.app.mysql.query(sql)
+          );
+        }
+      });
+      console.log(statisticsData);
     } catch (e) {
       console.log(e);
     }

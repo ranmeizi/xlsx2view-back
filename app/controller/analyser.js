@@ -64,7 +64,7 @@ class AnalyserController extends Controller {
       sqlList.forEach(sql => {
         this.app.mysql.query(sql);
       });
-
+      await ctx.service.statistics.creatBatchStatistics(stream.fields.batch)
       console.log('over');
       this.ctx.body = await this.ctx.service.response.index({ data: null, err: '' });
     } catch (err) {
