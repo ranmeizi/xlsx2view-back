@@ -36,6 +36,14 @@ class StatisticsController extends Controller {
       yArr,
     };
   }
+  // 分页查询
+  async selectLimit() {
+    try {
+      const { current } = this.ctx.request.body;
+    } catch (e) {
+      console.log(e);
+    }
+  }
 }
 
 module.exports = StatisticsController;

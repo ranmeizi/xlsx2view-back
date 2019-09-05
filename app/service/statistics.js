@@ -18,7 +18,7 @@ class StatisticsService extends Service {
       const formulaList = Object.values({ ...StatisticalTable });
       const statisticsData = {};
       // 循环StatisticalTable，使用bind到statisticsData上的方法执行,传递一个查询方法，让他依次给statisticsData赋值
-      //-------错误的循环--------foreach不阻塞
+      // -------错误的循环--------foreach不阻塞
       // Object.values(statConfig).forEach(async item => {
       //   if (item.round === 0) {
       //     await item.formula.bind(statisticsData)(batchData, async sql =>
@@ -33,32 +33,45 @@ class StatisticsService extends Service {
       //     );
       //   }
       // });
-      //-------正确的循环--------递归函数阻塞
-      const formulaList_round0 = formulaList.filter(item => item.round === 0)
-      const formulaList_round1 = formulaList.filter(item => item.round === 1)
-      let that = this
+      // -------正确的循环--------递归函数阻塞
+      const formulaList_round0 = formulaList.filter(item => item.round === 0);
+      const formulaList_round1 = formulaList.filter(item => item.round === 1);
+      const that = this;
       await (async function forEach(index) {
         if (index === formulaList_round0.length - 1) {
-          return
+          return;
         }
-        await formulaList_round0[index].formula.bind(statisticsData)(batchData, async sql =>
-          await that.app.mysql.query(sql)
+        await formulaList_round0[index].formula.bind(statisticsData)(
+          batchData,
+          async sql => await that.app.mysql.query(sql)
         );
-        await forEach(index + 1)
-      })(0)
+        await forEach(index + 1);
+      })(0);
       await (async function forEach(index) {
         if (index === formulaList_round1.length - 1) {
-          return
+          return;
         }
-        await formulaList_round1[index].formula.bind(statisticsData)(batchData, async sql =>
-          await that.app.mysql.query(sql)
+        await formulaList_round1[index].formula.bind(statisticsData)(
+          batchData,
+          async sql => await that.app.mysql.query(sql)
         );
-        await forEach(index + 1)
-      })(0)
-      console.log(statisticsData);
+        await forEach(index + 1);
+      })(0);
+      return statisticsData;
     } catch (e) {
-      console.log(e);
+      return {};
     }
+  }
+  async insertStatistics(data) {
+    const c = [];
+    const v = [];
+    Object.entries(data).forEach(([ key, value ]) => {
+      c.push(key);
+      value = StatisticalTable[key].type === 'varchar' ? `'${value}'` : value;
+      v.push(value);
+    });
+    const sql = `INSERT INTO rpt_table (${c.join(',')}) VALUES (${v.join(',')})`;
+    await this.app.mysql.query(sql);
   }
 }
 

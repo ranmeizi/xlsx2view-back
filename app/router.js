@@ -14,4 +14,6 @@ module.exports = app => {
   router.post('/result/pagedata', controller.analyser.selectLimit);
   // 统计接口
   router.get('/statistics/teststand', controller.statistics.teststand);
+  // 分页统计接口
+  router.post('/statistics/pagedata', controller.statistics.selectLimit);
 };

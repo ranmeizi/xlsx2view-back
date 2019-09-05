@@ -13,8 +13,8 @@ class AnalyserService extends Service {
     Object.entries(fields).forEach(([ key, value ]) => {
       c.push(key);
       value = COL_import_batch[key].type === 'varchar' ? `'${value}'` : value;
-      if(key==='game_date'){
-        value=`'${moment(value).format('YYYY-MM-DD HH:mm:ss')}'`
+      if (key === 'game_date') {
+        value = `'${moment(value).format('YYYY-MM-DD HH:mm:ss')}'`;
       }
       v.push(value);
     });

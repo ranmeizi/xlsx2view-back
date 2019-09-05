@@ -40,7 +40,7 @@ class AnalyserController extends Controller {
     try {
       const { ctx } = this;
       // ctx中获取流
-      const stream = await ctx.getFileStream({limits:{fields:20,fieldSize:5000000}});
+      const stream = await ctx.getFileStream({ limits: { fields: 20, fieldSize: 5000000 } });
 
       // 添加bacth表数据
       ctx.service.analyser.addBatch(stream.fields);
@@ -64,8 +64,12 @@ class AnalyserController extends Controller {
       sqlList.forEach(sql => {
         this.app.mysql.query(sql);
       });
-      await ctx.service.statistics.creatBatchStatistics(stream.fields.batch)
-      console.log('over');
+      const statisticsData = await ctx.service.statistics.creatBatchStatistics(stream.fields.batch);
+
+      // console.log(statisticsData);
+      // 存到statistic表
+      await ctx.service.statistics.insertStatistics(statisticsData);
+
       this.ctx.body = await this.ctx.service.response.index({ data: null, err: '' });
     } catch (err) {
       this.ctx.body = await this.ctx.service.response.index({ data: null, err });
