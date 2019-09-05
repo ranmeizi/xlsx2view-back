@@ -138,13 +138,15 @@ for (let i = 0; i < $keys.length; i++) {
 round:循环轮次
 0-第一次计算直接返回的值和常量和sql查询这类一次完成的值
 1-第二次计算比值这类依赖别的值的公式
+formula:计算公式
 */
 const StatisticalTable = {
   // 系统用批次号
   batch: {
     type: 'varchar',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
+      console.log(this)
       this.batch = batchData.batch;
     },
   },
@@ -152,7 +154,7 @@ const StatisticalTable = {
   opposition: {
     type: 'varchar',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.opposition = batchData.opposition;
     },
@@ -161,7 +163,7 @@ const StatisticalTable = {
   weekday: {
     type: 'varchar',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.weekday = batchData.weekday;
     },
@@ -170,7 +172,7 @@ const StatisticalTable = {
   days_since_prev_game: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.days_since_prev_game = batchData.days_since_prev_game;
     },
@@ -179,31 +181,31 @@ const StatisticalTable = {
   total_tickets_ebrite: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select count(*) as cnt from ticket_xls where ${baseFilter}`;
-      const result = await $QueryFn(sql)[0].cnt;
-      this.total_tickets_ebrite = result;
+      const result = await $QueryFn(sql);
+      this.total_tickets_ebrite = result[0].cnt;
     },
   },
   // 检票总数
   tickets_scanned: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select count(*) as cnt from ticket_xls where attendee_status='Checked In' and ${baseFilter}`;
-      const result = await $QueryFn(sql)[0].cnt;
-      this.tickets_scanned = result;
+      const result = await $QueryFn(sql);
+      this.tickets_scanned = result[0].cnt;
     },
   },
   // 检票率
   per_scanned: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       this.per_scanned = (
         this.tickets_scanned / this.total_tickets_ebrite
       ).toFixed(2);
@@ -213,28 +215,27 @@ const StatisticalTable = {
   capacity: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 这是个常量
-      return 2185;
+      this.capacity = 2185;
     },
   },
   // 季票？？？
   season_tics_comps: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
-      //
+    formula: async function(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select count(*) as cnt from ticket_xls where total_paid!='0'  and ticket_type not like '%Bundle%' and ${baseFilter}`;
-      const result = await $QueryFn(sql)[0].cnt;
-      this.season_tics_comps = result;
+      const result = await $QueryFn(sql);
+      this.season_tics_comps = result[0].cnt;
     },
   },
   // ???total_tickets_ebrite-season_tics_comps  不知道啥意义但是原来就是这个公式
   tickers_sold: {
     type: 'int',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       //
       this.tickers_sold = this.total_tickets_ebrite - this.season_tics_comps;
     },
@@ -243,7 +244,7 @@ const StatisticalTable = {
   per_sold_of_total: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       //
       this.per_sold_of_total = (
         this.tickers_sold / this.total_tickets_ebrite
@@ -254,7 +255,7 @@ const StatisticalTable = {
   per_total_of_capacity: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       this.per_total_of_capacity = (
         this.total_tickets_ebrite / this.capacity
       ).toFixed(2);
@@ -264,7 +265,7 @@ const StatisticalTable = {
   number_of_groups: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.number_of_groups = batchData.no_of_groups;
     },
@@ -273,7 +274,7 @@ const StatisticalTable = {
   total_adults_groups: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.total_adults_groups = batchData.group_adults;
     },
@@ -282,7 +283,7 @@ const StatisticalTable = {
   tot_child_groups: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.tot_child_groups = batchData.group_children;
     },
@@ -291,7 +292,7 @@ const StatisticalTable = {
   total_tics_group_per: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // （成人票+儿童票）/总票
       this.total_tics_group_per = (
         (this.total_adults_groups + this.tot_child_groups) /
@@ -303,43 +304,43 @@ const StatisticalTable = {
   income_gross_ebrite: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select SUM(total_paid) as sum from ticket_xls where order_type='Eventbrite Completed' and ${baseFilter}`;
-      const result = await $QueryFn(sql)[0].sum;
-      this.income_gross_ebrite = result;
+      const result = await $QueryFn(sql);
+      this.income_gross_ebrite = result[0].sum;
     },
   },
   // lbl card买票收入
   income_lbl_card_tics: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select SUM(total_paid) as sum from ticket_xls where order_type ='Paid Directly By Debit Card' and ${baseFilter}`;
-      const result = await $QueryFn(sql)[0].sum;
-      this.income_lbl_card_tics = result;
+      const result = await $QueryFn(sql);
+      this.income_lbl_card_tics = result[0].sum;
     },
   },
   // 其他买票收入
   income_other_tics: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select SUM(total_paid) as sum from ticket_xls where order_type not in ('Paid Directly By Debit Card','Eventbrite Completed') and ${baseFilter}`;
-      const result = await $QueryFn(sql)[0].sum;
-      this.income_other_tics = result;
+      const result = await $QueryFn(sql);
+      this.income_other_tics = result[0].sum;
     },
   },
   // 团体票收入
   income_groups_tickets: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.income_groups_tickets = batchData.group_tickets_revenue;
     },
@@ -348,25 +349,25 @@ const StatisticalTable = {
   total_tics_income: {
     type: 'double',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
       // Bundle收入
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Bundle%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
+      const result = await $QueryFn(sql);
       // income_gross_ebrite+income_lbl_card_tics+income_other_tics+income_gtoups_tickets+result
       this.total_tics_income =
         this.income_gross_ebrite +
         this.income_lbl_card_tics +
         this.income_other_tics +
-        this.income_gtoups_tickets +
-        result;
+        this.income_groups_tickets +
+        result[0].sum;
     },
   },
   // ebrite票的其他收入
   income_merch_other_ebrite: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.income_merch_other_ebrite = batchData.eventbrite_add_ons;
     },
@@ -375,7 +376,7 @@ const StatisticalTable = {
   income_merch_other_groups: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.income_merch_other_groups = batchData.group_add_ons_food;
     },
@@ -384,7 +385,7 @@ const StatisticalTable = {
   income_merch_other_none_group_packages: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.income_merch_other_none_group_packages =
         batchData.other_add_ons_food;
@@ -394,7 +395,7 @@ const StatisticalTable = {
   total_merch_other_income: {
     type: 'double',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 加一起
       this.total_merch_other_income =
         this.income_merch_other_ebrite +
@@ -406,15 +407,15 @@ const StatisticalTable = {
   per_inc_direct_sales: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       const all = this.total_tics_income + this.total_merch_other_income;
       const baseFilter = `batch='${batchData.batch}'`;
       // Bundle收入
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Bundle%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
+      const result = await $QueryFn(sql);
 
       this.per_inc_direct_sales = (
-        (this.income_groups_tickets + this.income_merch_other_groups + result) /
+        (this.income_groups_tickets + this.income_merch_other_groups + result[0].sum) /
         all
       ).toFixed(2);
     },
@@ -423,7 +424,7 @@ const StatisticalTable = {
   per_income_groups: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       const all = this.total_tics_income + this.total_merch_other_income;
       // 算比值
       this.per_income_groups = (
@@ -436,21 +437,21 @@ const StatisticalTable = {
   per_income_promos: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       const all = this.total_tics_income + this.total_merch_other_income;
       const baseFilter = `batch='${batchData.batch}'`;
       // Bundle收入
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Bundle%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
+      const result = await $QueryFn(sql)
       // 算比值
-      this.per_income_promos = (result / all).toFixed(2);
+      this.per_income_promos = (result[0].sum / all).toFixed(2);
     },
   },
   // 带票的总收入
   total_income_tics_merch_other: {
     type: 'double',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       const all = this.total_tics_income + this.total_merch_other_income;
       // 加一起
       this.total_income_tics_merch_other = all;
@@ -460,175 +461,175 @@ const StatisticalTable = {
   total_adults: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Adult%' and total_paid!='0' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].cnt) || 0;
-      this.total_adults = result;
+      const result = await $QueryFn(sql)
+      this.total_adults = result[0].cnt;
     },
   },
   // 特别票总数
   total_concessions: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Concession%' and total_paid!='0' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].cnt) || 0;
-      this.total_concessions = result;
+      const result = await $QueryFn(sql)
+      this.total_concessions = result[0].cnt;
     },
   },
   // 儿童票总数
   total_children: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Child%' and total_paid!='0' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].cnt) || 0;
-      this.total_children = result;
+      const result = await $QueryFn(sql)
+      this.total_children = result[0].cnt;
     },
   },
   // 家庭票1总数
   total_family1: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Family 1%' and total_paid!='0' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].cnt) || 0;
-      this.total_family1 = result;
+      const result = await $QueryFn(sql)
+      this.total_family1 = result[0].cnt;
     },
   },
   // 家庭票2总数
   total_family2: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Family 2%' and total_paid!='0' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].cnt) || 0;
-      this.total_family2 = result;
+      const result = await $QueryFn(sql)
+      this.total_family2 = result[0].cnt;
     },
   },
   // 成人票收入
   inc_audults: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Adult%' and total_paid!='0' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
-      this.inc_audults = result;
+      const result = await $QueryFn(sql)
+      this.inc_audults = result[0].sum;
     },
   },
   // 特别票收入
   inc_concessions: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Concession%' and total_paid!='0' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
-      this.inc_concessions = result;
+      const result = await $QueryFn(sql)
+      this.inc_concessions = result[0].sum;
     },
   },
   // 儿童票收入
   inc_children: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Child%' and total_paid!='0' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
-      this.inc_children = result;
+      const result = await $QueryFn(sql)
+      this.inc_children = result[0].sum;
     },
   },
   // 家庭票1收入
   inc_family1: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Family 1%' and total_paid!='0' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
-      this.inc_family1 = result;
+      const result = await $QueryFn(sql)
+      this.inc_family1 = result[0].sum;
     },
   },
   // 家庭票2收入
   inc_family2: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Family 2%' and total_paid!='0' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
-      this.inc_family2 = result;
+      const result = await $QueryFn(sql)
+      this.inc_family2 = result[0].sum;
     },
   },
   // Early Bird 票数
   early_bird_tics: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Early Bird%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].cnt) || 0;
-      this.early_bird_tics = result;
+      const result = await $QueryFn(sql)
+      this.early_bird_tics = result[0].cnt;
     },
   },
   // Advance 票数
   advance_tics: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Advance%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].cnt) || 0;
-      this.advance_tics = result;
+      const result = await $QueryFn(sql)
+      this.advance_tics = result[0].cnt;
     },
   },
   // gameday 票数
   gameday_tics: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Gameday%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].cnt) || 0;
-      this.gameday_tics = result;
+      const result = await $QueryFn(sql)
+      this.gameday_tics = result[0].cnt;
     },
   },
   // 其他 票数
   other_tics: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type not like '%Gameday%' and ticket_type NOT like '%Advance%' and ticket_type NOT like '%Early Bird%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].cnt) || 0;
-      this.other_tics = result;
+      const result = await $QueryFn(sql)
+      this.other_tics = result[0].cnt;
     },
   },
   // 平均票价
   ave_tics_per_purchase: {
     type: 'int',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       this.ave_tics_per_purchase = (
         (this.early_bird_tics +
           this.advance_tics +
@@ -642,55 +643,55 @@ const StatisticalTable = {
   inc_early_bird: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Early Bird%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
-      this.inc_early_bird = result;
+      const result = await $QueryFn(sql)
+      this.inc_early_bird = result[0].sum;
     },
   },
   // Advance 收入
   inc_advance: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Advance%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
-      this.inc_advance = result;
+      const result = await $QueryFn(sql)
+      this.inc_advance = result[0].sum;
     },
   },
   // gameday 收入
   inc_gameday: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Gameday%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
-      this.inc_gameday = result;
+      const result = await $QueryFn(sql)
+      this.inc_gameday = result[0].sum;
     },
   },
   // 其他 收入
   inc_other: {
     type: 'double',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type not like '%Gameday%' and ticket_type NOT like '%Advance%' and ticket_type NOT like '%Early Bird%' and ${baseFilter}`;
-      const result = (await $QueryFn(sql)[0].sum) || 0;
-      this.inc_other = result;
+      const result = await $QueryFn(sql)
+      this.inc_other = result[0].sum;
     },
   },
   // 这TM算的啥啊
   ave_pound_per_purchase: {
     type: 'double',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       this.ave_pound_per_purchase = (
         (this.inc_early_bird +
           this.inc_advance +
@@ -704,7 +705,7 @@ const StatisticalTable = {
   '1st_timers_this_season': {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
 
       // 用这个时间找赛季
@@ -744,7 +745,7 @@ const StatisticalTable = {
   '2nd_timers_this_season': {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
 
       // 用这个时间找赛季
@@ -784,7 +785,7 @@ const StatisticalTable = {
   '1st_timers_ever': {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
 
       // 选择用email区分，email不会重复，找出所有需要统计的email上一次订票日期
@@ -815,7 +816,7 @@ const StatisticalTable = {
   '2nd_timers_ever': {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
 
       // 选择用email区分，email不会重复，找出所有需要统计的email上一次订票日期
@@ -847,18 +848,18 @@ const StatisticalTable = {
   total_paying_accounts: {
     type: 'int',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select count(*)as cnt from (select * from ticket_xls where total_paid>0 and ${baseFilter} GROUP BY email) as a`;
-      const result = (await $QueryFn(sql)[0].cnt) || 0;
-      this.total_paying_accounts = result;
+      const result = await $QueryFn(sql)
+      this.total_paying_accounts = result[0].cnt;
     },
   },
   // 本赛季第一次占比
   per_1st_timers_this_season: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       this.per_1st_timers_this_season = (
         this['1st_timers_this_season'] / this.total_paying_accounts
       ).toFixed(2);
@@ -868,7 +869,7 @@ const StatisticalTable = {
   per_2nd_timers_this_season: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       this.per_2nd_timers_this_season = (
         this['2nd_timers_this_season'] / this.total_paying_accounts
       ).toFixed(2);
@@ -878,7 +879,7 @@ const StatisticalTable = {
   per_1st_timers_ever: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       this.per_1st_timers_ever = (
         this['1st_timers_ever'] / this.total_paying_accounts
       ).toFixed(2);
@@ -888,7 +889,7 @@ const StatisticalTable = {
   per_2st_timers_ever: {
     type: 'varchar',
     round: 1,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       this.per_2st_timers_ever = (
         this['2nd_timers_ever'] / this.total_paying_accounts
       ).toFixed(2);
@@ -898,7 +899,7 @@ const StatisticalTable = {
   lr_promotions: {
     type: 'varchar',
     round: 0,
-    formula: async (batchData, $QueryFn) => {
+    formula: async function(batchData, $QueryFn) {
       // 返回一个对象
       this.lr_promotions = {};
     },

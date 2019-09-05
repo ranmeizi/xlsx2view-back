@@ -13,6 +13,9 @@ class AnalyserService extends Service {
     Object.entries(fields).forEach(([ key, value ]) => {
       c.push(key);
       value = COL_import_batch[key].type === 'varchar' ? `'${value}'` : value;
+      if(key==='game_date'){
+        value=`'${moment(value).format('YYYY-MM-DD HH:mm:ss')}'`
+      }
       v.push(value);
     });
     const sql = `INSERT INTO import_batch (${c.join(',')},import_time) VALUES (${v.join(',')},'${moment().format('YYYY-MM-DD HH:mm:ss')}')`;
