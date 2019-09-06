@@ -1,6 +1,7 @@
 'use strict';
 
 const Controller = require('egg').Controller;
+const { StatisticalTable } = require('../utils/mapping');
 
 class StatisticsController extends Controller {
   async teststand() {
@@ -39,7 +40,20 @@ class StatisticsController extends Controller {
   // 分页查询
   async selectLimit() {
     try {
-      const { current } = this.ctx.request.body;
+      const { ctx } = this
+      const { current } = ctx.request.body;
+      const select = `select * from rpt_table limit ${(current - 1) * 12},12`
+      const selectCount = 'select count(*)as cnt from rpt_table'
+
+      const list = await this.app.mysql.query(select)
+      const count = await this.app.mysql.query(selectCount)
+      this.ctx.body = {
+        success: true,
+        data: {
+          list,
+          count: count[0].cnt
+        },
+      };
     } catch (e) {
       console.log(e);
     }
