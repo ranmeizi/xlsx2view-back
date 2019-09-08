@@ -12,8 +12,15 @@ module.exports = app => {
   router.post('/input/xlsx2db', controller.analyser.uploadXLSX);
   // 分页数据接口
   router.post('/result/pagedata', controller.analyser.selectLimit);
+  // 获取batch下拉列表
+  router.get('/result/batchSelect', controller.analyser.batchSelect);
+
   // 统计接口
   router.get('/statistics/teststand', controller.statistics.teststand);
   // 分页统计接口
   router.post('/statistics/pagedata', controller.statistics.selectLimit);
+  // 统计详情接口
+  router.post('/statistics/searchDetail', controller.statistics.searchDetail);
+  // 获取图表数据
+  router.post('/statistics/getChartData', controller.statistics.getChartData);
 };

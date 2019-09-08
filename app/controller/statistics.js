@@ -40,22 +40,57 @@ class StatisticsController extends Controller {
   // 分页查询
   async selectLimit() {
     try {
-      const { ctx } = this
+      const { ctx } = this;
       const { current } = ctx.request.body;
-      const select = `select * from rpt_table limit ${(current - 1) * 12},12`
-      const selectCount = 'select count(*)as cnt from rpt_table'
+      const select = `select * from rpt_table limit ${(current - 1) * 12},12`;
+      const selectCount = 'select count(*)as cnt from rpt_table';
 
-      const list = await this.app.mysql.query(select)
-      const count = await this.app.mysql.query(selectCount)
+      const list = await this.app.mysql.query(select);
+      const count = await this.app.mysql.query(selectCount);
       this.ctx.body = {
         success: true,
         data: {
           list,
-          count: count[0].cnt
+          count: count[0].cnt,
         },
       };
     } catch (e) {
       console.log(e);
+    }
+  }
+  async searchDetail() {
+    console.log('进来了');
+    const { ctx } = this;
+    try {
+      const { batch } = ctx.request.body;
+      const sql = `select * from rpt_table where batch='${batch}'`;
+      const result = await this.app.mysql.query(sql);
+      console.log(result);
+      ctx.body = await ctx.service.response.index({ data: result[0], err: '' });
+    } catch (e) {
+      console.log(e);
+      ctx.body = await ctx.service.response.index({ data: null, err: e });
+    }
+  }
+  async getChartData() {
+    const { ctx } = this;
+    try {
+      const { batchs } = ctx.request.body;
+      const sql = `select * from rpt_table where batch in ('${batchs.join("','")}')`;
+      const result = await this.app.mysql.query(sql);
+      // 统计维度
+      const oppositions = [];
+      result.forEach(item => {
+        oppositions.push(item.opposition);
+      });
+
+      ctx.body = await ctx.service.response.index({
+        data: { result, oppositions },
+        err: '',
+      });
+    } catch (e) {
+      console.log(e);
+      ctx.body = await ctx.service.response.index({ data: null, err: e });
     }
   }
 }

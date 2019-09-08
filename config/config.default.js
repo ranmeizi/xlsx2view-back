@@ -44,7 +44,7 @@ module.exports = appInfo => {
       // 用户名
       user: 'root',
       // 密码
-      password: 'UltraTel@5266',
+      password: 'xiaozhou222',
       // 数据库名
       database: 'test_analyser',
     },

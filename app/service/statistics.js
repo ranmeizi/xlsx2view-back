@@ -37,32 +37,35 @@ class StatisticsService extends Service {
       const formulaList_round0 = formulaList.filter(item => item.round === 0);
       const formulaList_round1 = formulaList.filter(item => item.round === 1);
       const that = this;
-      await (async function forEach(index) {
-        if (index === formulaList_round0.length - 1) {
+      await (async function forEach0(index) {
+        if (index === formulaList_round0.length) {
           return;
         }
         await formulaList_round0[index].formula.bind(statisticsData)(
           batchData,
           async sql => await that.app.mysql.query(sql)
         );
-        await forEach(index + 1);
+        await forEach0(index + 1);
       })(0);
-      await (async function forEach(index) {
-        if (index === formulaList_round1.length - 1) {
+      await (async function forEach1(index) {
+        if (index === formulaList_round1.length) {
           return;
         }
         await formulaList_round1[index].formula.bind(statisticsData)(
           batchData,
           async sql => await that.app.mysql.query(sql)
         );
-        await forEach(index + 1);
+        await forEach1(index + 1);
       })(0);
+      console.log(statisticsData);
       return statisticsData;
     } catch (e) {
+      console.log(e);
       return {};
     }
   }
   async insertStatistics(data) {
+    console.log(data);
     const c = [];
     const v = [];
     Object.entries(data).forEach(([ key, value ]) => {

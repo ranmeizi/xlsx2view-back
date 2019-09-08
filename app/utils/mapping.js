@@ -149,6 +149,13 @@ const StatisticalTable = {
       this.batch = batchData.batch;
     },
   },
+  game_date: {
+    type: 'varchar',
+    round: 0,
+    async formula(batchData, $QueryFn) {
+      this.game_date = batchData.game_date;
+    },
+  },
   // 对阵名称
   opposition: {
     type: 'varchar',
@@ -185,7 +192,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select count(*) as cnt from ticket_xls where ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.total_tickets_ebrite = result[0].cnt;
+      this.total_tickets_ebrite = result[0].cnt || 0;
     },
   },
   // 检票总数
@@ -197,7 +204,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select count(*) as cnt from ticket_xls where attendee_status='Checked In' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.tickets_scanned = result[0].cnt;
+      this.tickets_scanned = result[0].cnt || 0;
     },
   },
   // 检票率
@@ -227,7 +234,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select count(*) as cnt from ticket_xls where total_paid!='0'  and ticket_type not like '%Bundle%' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.season_tics_comps = result[0].cnt;
+      this.season_tics_comps = result[0].cnt || 0;
     },
   },
   // ???total_tickets_ebrite-season_tics_comps  不知道啥意义但是原来就是这个公式
@@ -308,7 +315,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select SUM(total_paid) as sum from ticket_xls where order_type='Eventbrite Completed' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.income_gross_ebrite = result[0].sum;
+      this.income_gross_ebrite = result[0].sum || 0;
     },
   },
   // lbl card买票收入
@@ -320,7 +327,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select SUM(total_paid) as sum from ticket_xls where order_type ='Paid Directly By Debit Card' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.income_lbl_card_tics = result[0].sum;
+      this.income_lbl_card_tics = result[0].sum || 0;
     },
   },
   // 其他买票收入
@@ -332,7 +339,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select SUM(total_paid) as sum from ticket_xls where order_type not in ('Paid Directly By Debit Card','Eventbrite Completed') and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.income_other_tics = result[0].sum;
+      this.income_other_tics = result[0].sum || 0;
     },
   },
   // 团体票收入
@@ -356,10 +363,10 @@ const StatisticalTable = {
       // income_gross_ebrite+income_lbl_card_tics+income_other_tics+income_gtoups_tickets+result
       this.total_tics_income =
         this.income_gross_ebrite +
-        this.income_lbl_card_tics +
-        this.income_other_tics +
-        this.income_groups_tickets +
-        result[0].sum;
+          this.income_lbl_card_tics +
+          this.income_other_tics +
+          this.income_groups_tickets +
+          result[0].sum || 0;
     },
   },
   // ebrite票的其他收入
@@ -414,8 +421,9 @@ const StatisticalTable = {
       const result = await $QueryFn(sql);
 
       this.per_inc_direct_sales = (
-        (this.income_groups_tickets + this.income_merch_other_groups + result[0].sum) /
-        all
+        (this.income_groups_tickets +
+          this.income_merch_other_groups +
+          result[0].sum || 0) / all
       ).toFixed(2);
     },
   },
@@ -443,7 +451,7 @@ const StatisticalTable = {
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Bundle%' and ${baseFilter}`;
       const result = await $QueryFn(sql);
       // 算比值
-      this.per_income_promos = (result[0].sum / all).toFixed(2);
+      this.per_income_promos = (result[0].sum || 0 / all).toFixed(2);
     },
   },
   // 带票的总收入
@@ -465,7 +473,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Adult%' and total_paid!='0' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.total_adults = result[0].cnt;
+      this.total_adults = result[0].cnt || 0;
     },
   },
   // 特别票总数
@@ -477,7 +485,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Concession%' and total_paid!='0' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.total_concessions = result[0].cnt;
+      this.total_concessions = result[0].cnt || 0;
     },
   },
   // 儿童票总数
@@ -489,7 +497,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Child%' and total_paid!='0' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.total_children = result[0].cnt;
+      this.total_children = result[0].cnt || 0;
     },
   },
   // 家庭票1总数
@@ -501,7 +509,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Family 1%' and total_paid!='0' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.total_family1 = result[0].cnt;
+      this.total_family1 = result[0].cnt || 0;
     },
   },
   // 家庭票2总数
@@ -513,7 +521,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Family 2%' and total_paid!='0' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.total_family2 = result[0].cnt;
+      this.total_family2 = result[0].cnt || 0;
     },
   },
   // 成人票收入
@@ -525,7 +533,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Adult%' and total_paid!='0' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.inc_audults = result[0].sum;
+      this.inc_audults = result[0].sum || 0;
     },
   },
   // 特别票收入
@@ -537,7 +545,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Concession%' and total_paid!='0' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.inc_concessions = result[0].sum;
+      this.inc_concessions = result[0].sum || 0;
     },
   },
   // 儿童票收入
@@ -549,7 +557,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Child%' and total_paid!='0' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.inc_children = result[0].sum;
+      this.inc_children = result[0].sum || 0;
     },
   },
   // 家庭票1收入
@@ -561,7 +569,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Family 1%' and total_paid!='0' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.inc_family1 = result[0].sum;
+      this.inc_family1 = result[0].sum || 0;
     },
   },
   // 家庭票2收入
@@ -573,7 +581,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Family 2%' and total_paid!='0' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.inc_family2 = result[0].sum;
+      this.inc_family2 = result[0].sum || 0;
     },
   },
   // Early Bird 票数
@@ -585,7 +593,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Early Bird%' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.early_bird_tics = result[0].cnt;
+      this.early_bird_tics = result[0].cnt || 0;
     },
   },
   // Advance 票数
@@ -597,7 +605,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Advance%' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.advance_tics = result[0].cnt;
+      this.advance_tics = result[0].cnt || 0;
     },
   },
   // gameday 票数
@@ -609,7 +617,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type like '%Gameday%' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.gameday_tics = result[0].cnt;
+      this.gameday_tics = result[0].cnt || 0;
     },
   },
   // 其他 票数
@@ -621,7 +629,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT count(*) as cnt from ticket_xls where ticket_type not like '%Gameday%' and ticket_type NOT like '%Advance%' and ticket_type NOT like '%Early Bird%' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.other_tics = result[0].cnt;
+      this.other_tics = result[0].cnt || 0;
     },
   },
   // 平均票价
@@ -647,7 +655,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Early Bird%' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.inc_early_bird = result[0].sum;
+      this.inc_early_bird = result[0].sum || 0;
     },
   },
   // Advance 收入
@@ -659,7 +667,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Advance%' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.inc_advance = result[0].sum;
+      this.inc_advance = result[0].sum || 0;
     },
   },
   // gameday 收入
@@ -671,7 +679,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type like '%Gameday%' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.inc_gameday = result[0].sum;
+      this.inc_gameday = result[0].sum || 0;
     },
   },
   // 其他 收入
@@ -683,7 +691,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `SELECT SUM(total_paid) as sum from ticket_xls where ticket_type not like '%Gameday%' and ticket_type NOT like '%Advance%' and ticket_type NOT like '%Early Bird%' and ${baseFilter}`;
       const result = await $QueryFn(sql);
-      this.inc_other = result[0].sum;
+      this.inc_other = result[0].sum || 0;
     },
   },
   // 这TM算的啥啊
@@ -851,7 +859,7 @@ const StatisticalTable = {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select count(*)as cnt from (select * from ticket_xls where total_paid>0 and ${baseFilter} GROUP BY email) as a`;
       const result = await $QueryFn(sql);
-      this.total_paying_accounts = result[0].cnt;
+      this.total_paying_accounts = result[0].cnt || 0;
     },
   },
   // 本赛季第一次占比
@@ -885,11 +893,11 @@ const StatisticalTable = {
     },
   },
   // 第二次来占比
-  per_2st_timers_ever: {
+  per_2nd_timers_ever: {
     type: 'varchar',
     round: 1,
     async formula(batchData, $QueryFn) {
-      this.per_2st_timers_ever = (
+      this.per_2nd_timers_ever = (
         this['2nd_timers_ever'] / this.total_paying_accounts
       ).toFixed(2);
     },
@@ -897,7 +905,7 @@ const StatisticalTable = {
   // 各类票数和占比 存json
   lr_promotions: {
     type: 'varchar',
-    round: 0,
+    round: 1,
     async formula(batchData, $QueryFn) {
       // 查出groupby discount的条数和totalpaid总和
       const baseFilter = `batch='${batchData.batch}'`;
@@ -906,33 +914,33 @@ const StatisticalTable = {
       // 返回一个对象
       const lr_promotions = {};
 
-      sql = `select count(*) as cnt, SUM(total_paid)as sum from ticket_xls WHEREticket_type like '%Bundle%' and ${baseFilter}`;
+      sql = `select count(*) as cnt, SUM(total_paid)as sum from ticket_xls WHERE ticket_type like '%Bundle%' and ${baseFilter}`;
       const result_bundle = await $QueryFn(sql);
       // bundle 数据
+      const { tickers_sold, total_tics_income } = this;
       lr_promotions.Bundle = {
-        count: result_bundle[0].cnt,
-        sum: result_bundle[0].sum,
-        per: (result_bundle[0].cnt / this.tickers_sold).toFixed(2),
+        count: result_bundle[0].cnt || 0,
+        sum: result_bundle[0].sum || 0,
+        per: (result_bundle[0].cnt || 0 / tickers_sold).toFixed(2),
       };
       // 所有优惠数据
-      let total_count;
-      let total_sum;
+      let total_count = 0;
+      let total_sum = 0;
       result_discount.forEach(item => {
         total_count += item.cnt;
         total_sum += item.sum;
         lr_promotions[item.discount] = {
-          count: item.cnt,
-          sum: item.sum,
-          per: (item.cnt / this.tickers_sold).toFixed(2),
+          count: item.cnt || 0,
+          sum: item.sum || 0,
+          per: (item.cnt || 0 / tickers_sold).toFixed(2),
         };
       });
-
       // 总数据
       lr_promotions.total = {
         count: total_count,
         sum: total_sum,
-        per: (total_count / this.tickers_sold).toFixed(2),
-        pet1: (total_sum / this.total_tics_income).toFixed(2),
+        per: (total_count / tickers_sold).toFixed(2),
+        pet1: (total_sum / total_tics_income).toFixed(2),
       };
       this.lr_promotions = JSON.stringify(lr_promotions);
     },

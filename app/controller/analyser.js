@@ -40,7 +40,9 @@ class AnalyserController extends Controller {
     try {
       const { ctx } = this;
       // ctx中获取流
-      const stream = await ctx.getFileStream({ limits: { fields: 20, fieldSize: 5000000 } });
+      const stream = await ctx.getFileStream({
+        limits: { fields: 20, fieldSize: 5000000 },
+      });
 
       // 添加bacth表数据
       ctx.service.analyser.addBatch(stream.fields);
@@ -64,15 +66,23 @@ class AnalyserController extends Controller {
       sqlList.forEach(sql => {
         this.app.mysql.query(sql);
       });
-      const statisticsData = await ctx.service.statistics.creatBatchStatistics(stream.fields.batch);
+      const statisticsData = await ctx.service.statistics.creatBatchStatistics(
+        stream.fields.batch
+      );
 
       // console.log(statisticsData);
       // 存到statistic表
       await ctx.service.statistics.insertStatistics(statisticsData);
 
-      this.ctx.body = await this.ctx.service.response.index({ data: null, err: '' });
+      this.ctx.body = await this.ctx.service.response.index({
+        data: null,
+        err: '',
+      });
     } catch (err) {
-      this.ctx.body = await this.ctx.service.response.index({ data: null, err });
+      this.ctx.body = await this.ctx.service.response.index({
+        data: null,
+        err,
+      });
     }
   }
   // 分页查询
@@ -97,6 +107,17 @@ class AnalyserController extends Controller {
       };
     } catch (e) {
       console.log(e);
+    }
+  }
+  // 查询batch下拉列表
+  async batchSelect() {
+    const { ctx } = this;
+    try {
+      const sql = 'select DISTINCT(opposition),batch from import_batch';
+      const batchs = await this.app.mysql.query(sql);
+      ctx.body = await ctx.service.response.index({ data: batchs, err: '' });
+    } catch (e) {
+      ctx.body = await ctx.service.response.index({ data: null, err: e });
     }
   }
 }
