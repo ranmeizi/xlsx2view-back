@@ -93,6 +93,20 @@ class StatisticsController extends Controller {
       ctx.body = await ctx.service.response.index({ data: null, err: e });
     }
   }
+  // 查询单场比赛数据分析
+  async getSingleField() {
+    const { ctx } = this
+    try{
+      const {batch,statTable}=ctx.request.body
+      let result={}
+      // 根据statTable调用service
+      switch(statTable){
+        case 'SELL_TICKET' : result=await ctx.service.statistics.search_SELL_TICKET
+      }
+    }catch(e){
+      ctx.body = await ctx.service.response.index({ data: null, err: e });
+    }
+  }
 }
 
 module.exports = StatisticsController;
