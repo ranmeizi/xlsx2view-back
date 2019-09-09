@@ -4,7 +4,6 @@ const Service = require('egg').Service;
 
 class ResponseService extends Service {
   async index({ err, data }) {
-    console.log(err, data);
     let success = true;
     let msg;
     // 有没有报错

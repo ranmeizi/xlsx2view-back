@@ -19,7 +19,6 @@ class AnalyserService extends Service {
       v.push(value);
     });
     const sql = `INSERT INTO import_batch (${c.join(',')},import_time) VALUES (${v.join(',')},'${moment().format('YYYY-MM-DD HH:mm:ss')}')`;
-    console.log(sql);
     await this.app.mysql.query(sql);
   }
   // 使用流获取buffer数组
@@ -54,7 +53,6 @@ class AnalyserService extends Service {
       // 错误，没有表头数据
     }
     const columns = dataArr[0].map(item => columnMapper[item].col);
-    // console.log(columns);
 
     const data = dataArr.filter((item, index) => index > 0);
     // 看看有没有要格式化时间的列
@@ -105,7 +103,6 @@ class AnalyserService extends Service {
    * return array 查询结果
    */
   async pageSelect() {
-    console.log(this.ctx.request.body);
     const {
       pageSize,
       startTime,
@@ -119,7 +116,6 @@ class AnalyserService extends Service {
       batchs.length > 0 ? ` and batch IN ('${batchs.join("','")}')` : '';
     const limit = ` limit ${(pageNum - 1) * pageSize},${pageSize}`;
     const sql = select + batch + limit;
-    console.log(sql);
     const rt = {
       list: await this.app.mysql.query(sql),
       count: await this.app.mysql.query(selectCount + batch),

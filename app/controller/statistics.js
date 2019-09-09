@@ -30,7 +30,6 @@ class StatisticsController extends Controller {
       });
       yArr[key] = arr;
     });
-    console.log(yArr);
     this.ctx.body = {
       legend,
       yAxis,
@@ -59,13 +58,11 @@ class StatisticsController extends Controller {
     }
   }
   async searchDetail() {
-    console.log('进来了');
     const { ctx } = this;
     try {
       const { batch } = ctx.request.body;
       const sql = `select * from rpt_table where batch='${batch}'`;
       const result = await this.app.mysql.query(sql);
-      console.log(result);
       ctx.body = await ctx.service.response.index({ data: result[0], err: '' });
     } catch (e) {
       console.log(e);
@@ -76,7 +73,9 @@ class StatisticsController extends Controller {
     const { ctx } = this;
     try {
       const { batchs } = ctx.request.body;
-      const sql = `select * from rpt_table where batch in ('${batchs.join("','")}')`;
+      const sql = `select * from rpt_table where batch in ('${batchs.join(
+        "','"
+      )}')`;
       const result = await this.app.mysql.query(sql);
       // 统计维度
       const oppositions = [];
@@ -95,15 +94,28 @@ class StatisticsController extends Controller {
   }
   // 查询单场比赛数据分析
   async getSingleField() {
-    const { ctx } = this
-    try{
-      const {batch,statTable}=ctx.request.body
-      let result={}
+    const { ctx } = this;
+    try {
+      const { statTable } = ctx.request.body;
+      let result = {};
       // 根据statTable调用service
-      switch(statTable){
-        case 'SELL_TICKET' : result=await ctx.service.statistics.search_SELL_TICKET
+      switch (statTable) {
+        case 'Income_ticket':
+          result = await ctx.service.statistics.search_INC_TIC();
+          break;
+        case 'Income_ticket_dataset':
+          result = await ctx.service.statistics.search_INC_TIC_DSET();
+          break;
+        default:
+          ctx.body = await ctx.service.response.index({
+            data: null,
+            err: 'no data',
+          });
+          return; // 结束
       }
-    }catch(e){
+      console.log(result);
+      ctx.body = await ctx.service.response.index({ data: result, err: '' });
+    } catch (e) {
       ctx.body = await ctx.service.response.index({ data: null, err: e });
     }
   }

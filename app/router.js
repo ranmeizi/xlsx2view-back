@@ -23,4 +23,6 @@ module.exports = app => {
   router.post('/statistics/searchDetail', controller.statistics.searchDetail);
   // 获取图表数据
   router.post('/statistics/getChartData', controller.statistics.getChartData);
+  // cuntomer 单场比赛统计图数据
+  router.post('/statistics/getSingleField', controller.statistics.getSingleField);
 };

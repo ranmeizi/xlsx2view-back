@@ -73,8 +73,20 @@ class StatisticsService extends Service {
       value = StatisticalTable[key].type === 'varchar' ? `'${value}'` : value;
       v.push(value);
     });
-    const sql = `INSERT INTO rpt_table (${c.join(',')}) VALUES (${v.join(',')})`;
+    const sql = `INSERT INTO rpt_table (${c.join(',')}) VALUES (${v.join(
+      ','
+    )})`;
     await this.app.mysql.query(sql);
+  }
+  async search_INC_TIC() {
+    const { batch } = this.ctx.request.body;
+    const baseFilter = `batch='${batch}'`;
+    const typeSQL = `SELECT ticket_type,COUNT(*)as cnt,SUM(total_paid)as sum FROM ticket_xls where ${baseFilter} GROUP BY ticket_type`;
+    const tierSQL = `SELECT price_tier,COUNT(*)as cnt,SUM(total_paid)as sum FROM ticket_xls where ${baseFilter} GROUP BY price_tier`;
+    return {
+      ticket_type: await this.app.mysql.query(typeSQL),
+      price_tier: await this.app.mysql.query(tierSQL),
+    };
   }
 }
 
