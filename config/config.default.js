@@ -24,7 +24,7 @@ module.exports = appInfo => {
       enable: false,
       ignoreJSON: false,
     },
-    domainWhiteList: ['http://localhost:8080'],
+    domainWhiteList: [ 'http://localhost:8080' ],
   };
   const userConfig = {
     // myAppName: 'egg',
@@ -44,7 +44,7 @@ module.exports = appInfo => {
       // 用户名
       user: 'root',
       // 密码
-      password: 'UltraTel@5266',
+      password: 'xiaozhou222',
       // 数据库名
       database: 'test_analyser',
     },
@@ -56,7 +56,7 @@ module.exports = appInfo => {
 
   // 设置multipart的后缀格式
   config.multipart = {
-    fileExtensions: ['.xls', '.xlsx', '.xlsm'],
+    fileExtensions: [ '.xls', '.xlsx', '.xlsm' ],
   };
 
   return {
