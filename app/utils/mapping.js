@@ -140,10 +140,47 @@ round:循环轮次
 1-第二次计算比值这类依赖别的值的公式
 formula:计算公式
 */
+const DetailGroup = {
+  base: {
+    lable: '',
+    index: 0
+  },
+  'Ticketing': {
+    label: 'Ticketing',
+    index: 1
+  },
+  'Income tickets': {
+    label: 'Income tickets',
+    index: 2
+  },
+  'Income Merch/Other': {
+    label: 'Income Merch/Other',
+    index: 3
+  },
+  'Total Income': {
+    label: 'Total Income',
+    index: 4
+  },
+  'Sales by Ticket Type': {
+    label: 'Sales by Ticket Type',
+    index: 5
+  },
+  'Sales by Ticket Tier': {
+    label: 'Sales by Ticket Tier',
+    index: 6
+  },
+  'Customer Analysis': {
+    label: 'Customer Analysis',
+    index: 7
+  }
+}
 const StatisticalTable = {
   // 系统用批次号
   batch: {
     type: 'varchar',
+    group: 'base',
+    label: 'Batch Name',
+    type: 0,
     round: 0,
     async formula(batchData, $QueryFn) {
       this.batch = batchData.batch;
@@ -152,6 +189,9 @@ const StatisticalTable = {
   game_date: {
     type: 'varchar',
     round: 0,
+    type: 0,
+    group: 'base',
+    label: 'Game Day',
     async formula(batchData, $QueryFn) {
       this.game_date = batchData.game_date;
     },
@@ -160,6 +200,9 @@ const StatisticalTable = {
   opposition: {
     type: 'varchar',
     round: 0,
+    type: 0,
+    group: 'base',
+    label: 'Opposition',
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.opposition = batchData.opposition;
@@ -169,6 +212,9 @@ const StatisticalTable = {
   weekday: {
     type: 'varchar',
     round: 0,
+    type: 0,
+    group: 'base',
+    label: 'Day',
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.weekday = batchData.weekday;
@@ -178,6 +224,9 @@ const StatisticalTable = {
   days_since_prev_game: {
     type: 'int',
     round: 0,
+    type: 0,
+    group: 'base',
+    label: 'Days from Last Game',
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.days_since_prev_game = batchData.days_since_prev_game;
@@ -187,6 +236,9 @@ const StatisticalTable = {
   total_tickets_ebrite: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Ticketing',
+    label: 'Total Tickets(\'brite)',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -199,6 +251,9 @@ const StatisticalTable = {
   tickets_scanned: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Ticketing',
+    label: 'Tickets Scanned',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -211,6 +266,9 @@ const StatisticalTable = {
   per_scanned: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Ticketing',
+    label: '% scanned',
     async formula(batchData, $QueryFn) {
       this.per_scanned = (
         this.tickets_scanned / this.total_tickets_ebrite
@@ -221,6 +279,9 @@ const StatisticalTable = {
   capacity: {
     type: 'int',
     round: 0,
+    type: 0,
+    group: 'Ticketing',
+    label: 'Capacity!',
     async formula(batchData, $QueryFn) {
       // 这是个常量
       this.capacity = 2185;
@@ -230,6 +291,9 @@ const StatisticalTable = {
   season_tics_comps: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Ticketing',
+    label: 'Season Tics/Comps',
     async formula(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select count(*) as cnt from ticket_xls where total_paid!='0'  and ticket_type not like '%Bundle%' and ${baseFilter}`;
@@ -241,6 +305,9 @@ const StatisticalTable = {
   tickers_sold: {
     type: 'int',
     round: 1,
+    type: 2,
+    group: 'Ticketing',
+    label: 'Tickets Sold',
     async formula(batchData, $QueryFn) {
       //
       this.tickers_sold = this.total_tickets_ebrite - this.season_tics_comps;
@@ -250,6 +317,9 @@ const StatisticalTable = {
   per_sold_of_total: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Ticketing',
+    label: '% sold of total',
     async formula(batchData, $QueryFn) {
       //
       this.per_sold_of_total = (
@@ -261,6 +331,9 @@ const StatisticalTable = {
   per_total_of_capacity: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Ticketing',
+    label: '% total of capacity',
     async formula(batchData, $QueryFn) {
       this.per_total_of_capacity = (
         this.total_tickets_ebrite / this.capacity
@@ -271,6 +344,9 @@ const StatisticalTable = {
   number_of_groups: {
     type: 'int',
     round: 0,
+    type: 0,
+    group: 'Ticketing',
+    label: 'Number of Groups',
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.number_of_groups = batchData.no_of_groups;
@@ -280,6 +356,9 @@ const StatisticalTable = {
   total_adults_groups: {
     type: 'int',
     round: 0,
+    type: 0,
+    group: 'Ticketing',
+    label: 'Total Adults(groups)',
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.total_adults_groups = batchData.group_adults;
@@ -289,6 +368,9 @@ const StatisticalTable = {
   tot_child_groups: {
     type: 'int',
     round: 0,
+    type: 0,
+    group: 'Ticketing',
+    label: 'Tot Child(groups)',
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.tot_child_groups = batchData.group_children;
@@ -298,6 +380,9 @@ const StatisticalTable = {
   total_tics_group_per: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Ticketing',
+    label: 'Total Tics Group %',
     async formula(batchData, $QueryFn) {
       // （成人票+儿童票）/总票
       this.total_tics_group_per = (
@@ -310,6 +395,9 @@ const StatisticalTable = {
   income_gross_ebrite: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Income tickets',
+    label: 'Income Gross(E\'brite)',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -322,6 +410,9 @@ const StatisticalTable = {
   income_lbl_card_tics: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Income tickets',
+    label: 'Income LBL card tics',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -334,6 +425,9 @@ const StatisticalTable = {
   income_other_tics: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Income tickets',
+    label: 'Income other tics',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -346,6 +440,9 @@ const StatisticalTable = {
   income_groups_tickets: {
     type: 'double',
     round: 0,
+    type: 0,
+    group: 'Income tickets',
+    label: 'Income Groups tickets',
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.income_groups_tickets = batchData.group_tickets_revenue;
@@ -355,6 +452,9 @@ const StatisticalTable = {
   total_tics_income: {
     type: 'double',
     round: 1,
+    type: 2,
+    group: 'Income tickets',
+    label: 'Total Tics income',
     async formula(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
       // Bundle收入
@@ -363,16 +463,19 @@ const StatisticalTable = {
       // income_gross_ebrite+income_lbl_card_tics+income_other_tics+income_gtoups_tickets+result
       this.total_tics_income =
         this.income_gross_ebrite +
-          this.income_lbl_card_tics +
-          this.income_other_tics +
-          this.income_groups_tickets +
-          result[0].sum || 0;
+        this.income_lbl_card_tics +
+        this.income_other_tics +
+        this.income_groups_tickets +
+        result[0].sum || 0;
     },
   },
   // ebrite票的其他收入
   income_merch_other_ebrite: {
     type: 'double',
     round: 0,
+    type: 0,
+    group: 'Income Merch/Other',
+    label: 'Income merch/other(E\'brite)',
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.income_merch_other_ebrite = batchData.eventbrite_add_ons;
@@ -382,6 +485,9 @@ const StatisticalTable = {
   income_merch_other_groups: {
     type: 'double',
     round: 0,
+    type: 0,
+    group: 'Income Merch/Other',
+    label: 'Income merch/other(Groups)',
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.income_merch_other_groups = batchData.group_add_ons_food;
@@ -391,6 +497,9 @@ const StatisticalTable = {
   income_merch_other_none_group_packages: {
     type: 'double',
     round: 0,
+    type: 0,
+    group: 'Income Merch/Other',
+    label: 'Income merch/other(Non-GroupPackages)',
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.income_merch_other_none_group_packages =
@@ -401,6 +510,9 @@ const StatisticalTable = {
   total_merch_other_income: {
     type: 'double',
     round: 1,
+    type: 2,
+    group: 'Income Merch/Other',
+    label: 'Total Merch/other income',
     async formula(batchData, $QueryFn) {
       // 加一起
       this.total_merch_other_income =
@@ -413,6 +525,9 @@ const StatisticalTable = {
   per_inc_direct_sales: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Total Income',
+    label: '% inc direct sales',
     async formula(batchData, $QueryFn) {
       const all = this.total_tics_income + this.total_merch_other_income;
       const baseFilter = `batch='${batchData.batch}'`;
@@ -431,6 +546,9 @@ const StatisticalTable = {
   per_income_groups: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Total Income',
+    label: '% inc groups',
     async formula(batchData, $QueryFn) {
       const all = this.total_tics_income + this.total_merch_other_income;
       // 算比值
@@ -444,6 +562,9 @@ const StatisticalTable = {
   per_income_promos: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Total Income',
+    label: '% income promos',
     async formula(batchData, $QueryFn) {
       const all = this.total_tics_income + this.total_merch_other_income;
       const baseFilter = `batch='${batchData.batch}'`;
@@ -458,6 +579,9 @@ const StatisticalTable = {
   total_income_tics_merch_other: {
     type: 'double',
     round: 1,
+    type: 2,
+    group: 'Total Income',
+    label: '% Total Income(tics,merch,other)',
     async formula(batchData, $QueryFn) {
       const all = this.total_tics_income + this.total_merch_other_income;
       // 加一起
@@ -468,6 +592,9 @@ const StatisticalTable = {
   total_adults: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Type',
+    label: 'Total Adults',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -480,6 +607,9 @@ const StatisticalTable = {
   total_concessions: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Type',
+    label: 'Total Concessions',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -492,6 +622,9 @@ const StatisticalTable = {
   total_children: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Type',
+    label: 'Total Children',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -504,6 +637,9 @@ const StatisticalTable = {
   total_family1: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Type',
+    label: 'Total Family1',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -516,6 +652,9 @@ const StatisticalTable = {
   total_family2: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Type',
+    label: 'Total Family2',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -528,6 +667,9 @@ const StatisticalTable = {
   inc_audults: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Type',
+    label: 'Inc Adults',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -540,6 +682,9 @@ const StatisticalTable = {
   inc_concessions: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Type',
+    label: 'Inc Concessions',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -552,6 +697,9 @@ const StatisticalTable = {
   inc_children: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Type',
+    label: 'Inc Children',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -564,6 +712,9 @@ const StatisticalTable = {
   inc_family1: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Type',
+    label: 'Inc Family1',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -576,6 +727,9 @@ const StatisticalTable = {
   inc_family2: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Type',
+    label: 'Inc Family2',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -588,6 +742,9 @@ const StatisticalTable = {
   early_bird_tics: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Tier',
+    label: 'Early Bird tics',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -600,6 +757,9 @@ const StatisticalTable = {
   advance_tics: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Tier',
+    label: 'Advance tics',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -612,6 +772,9 @@ const StatisticalTable = {
   gameday_tics: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Tier',
+    label: 'Gameday tics',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -624,6 +787,9 @@ const StatisticalTable = {
   other_tics: {
     type: 'int',
     round: 0,
+    type: 2,
+    group: 'Sales by Ticket Tier',
+    label: 'Other tics',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -636,6 +802,9 @@ const StatisticalTable = {
   ave_tics_per_purchase: {
     type: 'int',
     round: 1,
+    type: 2,
+    group: 'Sales by Ticket Tier',
+    label: 'Ave Tics Per Purchase',
     async formula(batchData, $QueryFn) {
       this.ave_tics_per_purchase = (
         (this.early_bird_tics +
@@ -650,6 +819,9 @@ const StatisticalTable = {
   inc_early_bird: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Tier',
+    label: 'Inc Early Bird',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -662,6 +834,9 @@ const StatisticalTable = {
   inc_advance: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Tier',
+    label: 'Inc Advance',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -674,6 +849,9 @@ const StatisticalTable = {
   inc_gameday: {
     type: 'double',
     round: 0,
+    type: 1,
+    group: 'Sales by Ticket Tier',
+    label: 'Inc Gameday',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -686,6 +864,9 @@ const StatisticalTable = {
   inc_other: {
     type: 'double',
     round: 0,
+    type: 2,
+    group: 'Sales by Ticket Tier',
+    label: 'Inc Other',
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -698,6 +879,9 @@ const StatisticalTable = {
   ave_pound_per_purchase: {
     type: 'double',
     round: 1,
+    type: 1,
+    group: 'Sales by Ticket Tier',
+    label: 'Ave £ per purchase',
     async formula(batchData, $QueryFn) {
       this.ave_pound_per_purchase = (
         (this.inc_early_bird +
@@ -712,6 +896,9 @@ const StatisticalTable = {
   '1st_timers_this_season': {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Customer Analysis',
+    label: '1st timers this season',
     async formula(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
 
@@ -752,6 +939,9 @@ const StatisticalTable = {
   '2nd_timers_this_season': {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Customer Analysis',
+    label: '2nd timers this season',
     async formula(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
 
@@ -792,6 +982,9 @@ const StatisticalTable = {
   '1st_timers_ever': {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Customer Analysis',
+    label: '1st timers ever',
     async formula(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
 
@@ -823,6 +1016,9 @@ const StatisticalTable = {
   '2nd_timers_ever': {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Customer Analysis',
+    label: '2nd timers ever',
     async formula(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
 
@@ -855,6 +1051,9 @@ const StatisticalTable = {
   total_paying_accounts: {
     type: 'int',
     round: 0,
+    type: 1,
+    group: 'Customer Analysis',
+    label: 'Total Paying Accounts',
     async formula(batchData, $QueryFn) {
       const baseFilter = `batch='${batchData.batch}'`;
       const sql = `select count(*)as cnt from (select * from ticket_xls where total_paid>0 and ${baseFilter} GROUP BY email) as a`;
@@ -866,6 +1065,9 @@ const StatisticalTable = {
   per_1st_timers_this_season: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Customer Analysis',
+    label: '% 1st timers this season',
     async formula(batchData, $QueryFn) {
       this.per_1st_timers_this_season = (
         this['1st_timers_this_season'] / this.total_paying_accounts
@@ -876,6 +1078,9 @@ const StatisticalTable = {
   per_2nd_timers_this_season: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Customer Analysis',
+    label: '% 2nd timers this season',
     async formula(batchData, $QueryFn) {
       this.per_2nd_timers_this_season = (
         this['2nd_timers_this_season'] / this.total_paying_accounts
@@ -886,6 +1091,9 @@ const StatisticalTable = {
   per_1st_timers_ever: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Customer Analysis',
+    label: '% 1st timers ever',
     async formula(batchData, $QueryFn) {
       this.per_1st_timers_ever = (
         this['1st_timers_ever'] / this.total_paying_accounts
@@ -896,6 +1104,9 @@ const StatisticalTable = {
   per_2nd_timers_ever: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Customer Analysis',
+    label: '% 2nd timers ever',
     async formula(batchData, $QueryFn) {
       this.per_2nd_timers_ever = (
         this['2nd_timers_ever'] / this.total_paying_accounts
@@ -906,6 +1117,9 @@ const StatisticalTable = {
   lr_promotions: {
     type: 'varchar',
     round: 1,
+    type: 2,
+    group: 'Customer Analysis',
+    label: '% 2nd timers ever',
     async formula(batchData, $QueryFn) {
       // 查出groupby discount的条数和totalpaid总和
       const baseFilter = `batch='${batchData.batch}'`;
@@ -951,3 +1165,4 @@ exports.columnMapper = columnMapper;
 exports.reverseCol = reverseCol;
 exports.COL_import_batch = COL_import_batch;
 exports.StatisticalTable = StatisticalTable;
+exports.DetailGroup = DetailGroup

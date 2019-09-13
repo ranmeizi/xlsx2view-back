@@ -1,7 +1,7 @@
 'use strict';
 
 const Controller = require('egg').Controller;
-const { StatisticalTable } = require('../utils/mapping');
+const { StatisticalTable, DetailGroup } = require('../utils/mapping');
 
 class StatisticsController extends Controller {
   async teststand() {
@@ -63,7 +63,21 @@ class StatisticsController extends Controller {
       const { batch } = ctx.request.body;
       const sql = `select * from rpt_table where batch='${batch}'`;
       const result = await this.app.mysql.query(sql);
-      ctx.body = await ctx.service.response.index({ data: result[0], err: '' });
+      let describe = {}
+      Object.entries(StatisticalTable).forEach(([key, value]) => {
+        describe[key] = {
+          group: value.group,
+          label: value.label,
+          type: value.type
+        }
+      })
+      ctx.body = await ctx.service.response.index({
+        data: {
+          detail: result[0],
+          describe,
+          DetailGroup
+        }, err: ''
+      });
     } catch (e) {
       console.log(e);
       ctx.body = await ctx.service.response.index({ data: null, err: e });
