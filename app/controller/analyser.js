@@ -90,6 +90,7 @@ class AnalyserController extends Controller {
     try {
       // 根据筛选条件查询数据库
       let { list, count } = await this.ctx.service.analyser.pageSelect();
+      console.log(list, count);
       count = count[0].CNT;
       // 表头
       const column = await this.ctx.service.analyser.getColumn(list);
@@ -113,12 +114,33 @@ class AnalyserController extends Controller {
   async batchSelect() {
     const { ctx } = this;
     try {
-      const sql = 'select DISTINCT(opposition),batch from import_batch';
+      const sql =
+        'select DISTINCT(opposition),batch,game_date from import_batch';
       const batchs = await this.app.mysql.query(sql);
       ctx.body = await ctx.service.response.index({ data: batchs, err: '' });
     } catch (e) {
       ctx.body = await ctx.service.response.index({ data: null, err: e });
     }
+  }
+  // 删除3个表中的batch数据
+  async deleteBatch() {
+    const { ctx } = this;
+    const { batchs } = ctx.request.body;
+    const sql = [];
+    if (batchs.length > 0) {
+      sql.push(`delete FROM import_batch where batch IN ('${batchs.join("','")}')`);
+      sql.push(`delete FROM rpt_table where batch IN ('${batchs.join("','")}')`);
+      sql.push(`delete FROM ticket_xls where batch IN ('${batchs.join("','")}')`);
+    }
+    const that = this;
+    await (async function dosql(index) {
+      if (index === sql.length) {
+        return;
+      }
+      await that.app.mysql.query(sql[index]);
+      await dosql(index + 1);
+    })(0);
+    ctx.body = await ctx.service.response.index({ data: true, err: '' });
   }
 }
 

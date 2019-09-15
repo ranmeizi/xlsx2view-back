@@ -143,44 +143,50 @@ formula:计算公式
 const DetailGroup = {
   base: {
     lable: '',
-    index: 0
+    index: 0,
   },
-  'Ticketing': {
+  Ticketing: {
     label: 'Ticketing',
-    index: 1
+    index: 1,
   },
   'Income tickets': {
     label: 'Income tickets',
-    index: 2
+    index: 2,
   },
   'Income Merch/Other': {
     label: 'Income Merch/Other',
-    index: 3
+    index: 3,
   },
   'Total Income': {
     label: 'Total Income',
-    index: 4
+    index: 4,
   },
   'Sales by Ticket Type': {
     label: 'Sales by Ticket Type',
-    index: 5
+    index: 5,
   },
   'Sales by Ticket Tier': {
     label: 'Sales by Ticket Tier',
-    index: 6
+    index: 6,
   },
   'Customer Analysis': {
     label: 'Customer Analysis',
-    index: 7
-  }
-}
+    index: 7,
+  },
+};
+
+const fixType = {
+  Percentage: '%',
+  Money: '£',
+};
+
 const StatisticalTable = {
   // 系统用批次号
   batch: {
     type: 'varchar',
     group: 'base',
     label: 'Batch Name',
-    type: 0,
+    showType: 0,
     round: 0,
     async formula(batchData, $QueryFn) {
       this.batch = batchData.batch;
@@ -189,7 +195,7 @@ const StatisticalTable = {
   game_date: {
     type: 'varchar',
     round: 0,
-    type: 0,
+    showType: 0,
     group: 'base',
     label: 'Game Day',
     async formula(batchData, $QueryFn) {
@@ -200,7 +206,7 @@ const StatisticalTable = {
   opposition: {
     type: 'varchar',
     round: 0,
-    type: 0,
+    showType: 0,
     group: 'base',
     label: 'Opposition',
     async formula(batchData, $QueryFn) {
@@ -212,7 +218,7 @@ const StatisticalTable = {
   weekday: {
     type: 'varchar',
     round: 0,
-    type: 0,
+    showType: 0,
     group: 'base',
     label: 'Day',
     async formula(batchData, $QueryFn) {
@@ -224,7 +230,7 @@ const StatisticalTable = {
   days_since_prev_game: {
     type: 'int',
     round: 0,
-    type: 0,
+    showType: 0,
     group: 'base',
     label: 'Days from Last Game',
     async formula(batchData, $QueryFn) {
@@ -236,9 +242,9 @@ const StatisticalTable = {
   total_tickets_ebrite: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Ticketing',
-    label: 'Total Tickets(\'brite)',
+    label: "Total Tickets('brite)",
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -251,7 +257,7 @@ const StatisticalTable = {
   tickets_scanned: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Ticketing',
     label: 'Tickets Scanned',
     async formula(batchData, $QueryFn) {
@@ -266,7 +272,8 @@ const StatisticalTable = {
   per_scanned: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Ticketing',
     label: '% scanned',
     async formula(batchData, $QueryFn) {
@@ -279,7 +286,7 @@ const StatisticalTable = {
   capacity: {
     type: 'int',
     round: 0,
-    type: 0,
+    showType: 0,
     group: 'Ticketing',
     label: 'Capacity!',
     async formula(batchData, $QueryFn) {
@@ -291,7 +298,7 @@ const StatisticalTable = {
   season_tics_comps: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Ticketing',
     label: 'Season Tics/Comps',
     async formula(batchData, $QueryFn) {
@@ -305,7 +312,7 @@ const StatisticalTable = {
   tickers_sold: {
     type: 'int',
     round: 1,
-    type: 2,
+    showType: 2,
     group: 'Ticketing',
     label: 'Tickets Sold',
     async formula(batchData, $QueryFn) {
@@ -317,7 +324,8 @@ const StatisticalTable = {
   per_sold_of_total: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Ticketing',
     label: '% sold of total',
     async formula(batchData, $QueryFn) {
@@ -331,7 +339,8 @@ const StatisticalTable = {
   per_total_of_capacity: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Ticketing',
     label: '% total of capacity',
     async formula(batchData, $QueryFn) {
@@ -344,7 +353,7 @@ const StatisticalTable = {
   number_of_groups: {
     type: 'int',
     round: 0,
-    type: 0,
+    showType: 0,
     group: 'Ticketing',
     label: 'Number of Groups',
     async formula(batchData, $QueryFn) {
@@ -356,7 +365,7 @@ const StatisticalTable = {
   total_adults_groups: {
     type: 'int',
     round: 0,
-    type: 0,
+    showType: 0,
     group: 'Ticketing',
     label: 'Total Adults(groups)',
     async formula(batchData, $QueryFn) {
@@ -368,7 +377,7 @@ const StatisticalTable = {
   tot_child_groups: {
     type: 'int',
     round: 0,
-    type: 0,
+    showType: 0,
     group: 'Ticketing',
     label: 'Tot Child(groups)',
     async formula(batchData, $QueryFn) {
@@ -380,7 +389,8 @@ const StatisticalTable = {
   total_tics_group_per: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Ticketing',
     label: 'Total Tics Group %',
     async formula(batchData, $QueryFn) {
@@ -395,9 +405,10 @@ const StatisticalTable = {
   income_gross_ebrite: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Income tickets',
-    label: 'Income Gross(E\'brite)',
+    label: "Income Gross(E'brite)",
     async formula(batchData, $QueryFn) {
       // sql查询xlsData的表获取结果
       const baseFilter = `batch='${batchData.batch}'`;
@@ -410,7 +421,8 @@ const StatisticalTable = {
   income_lbl_card_tics: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Income tickets',
     label: 'Income LBL card tics',
     async formula(batchData, $QueryFn) {
@@ -425,7 +437,8 @@ const StatisticalTable = {
   income_other_tics: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Income tickets',
     label: 'Income other tics',
     async formula(batchData, $QueryFn) {
@@ -440,7 +453,8 @@ const StatisticalTable = {
   income_groups_tickets: {
     type: 'double',
     round: 0,
-    type: 0,
+    showType: 0,
+    prefix: fixType.Money,
     group: 'Income tickets',
     label: 'Income Groups tickets',
     async formula(batchData, $QueryFn) {
@@ -452,7 +466,8 @@ const StatisticalTable = {
   total_tics_income: {
     type: 'double',
     round: 1,
-    type: 2,
+    showType: 2,
+    prefix: fixType.Money,
     group: 'Income tickets',
     label: 'Total Tics income',
     async formula(batchData, $QueryFn) {
@@ -463,19 +478,20 @@ const StatisticalTable = {
       // income_gross_ebrite+income_lbl_card_tics+income_other_tics+income_gtoups_tickets+result
       this.total_tics_income =
         this.income_gross_ebrite +
-        this.income_lbl_card_tics +
-        this.income_other_tics +
-        this.income_groups_tickets +
-        result[0].sum || 0;
+          this.income_lbl_card_tics +
+          this.income_other_tics +
+          this.income_groups_tickets +
+          result[0].sum || 0;
     },
   },
   // ebrite票的其他收入
   income_merch_other_ebrite: {
     type: 'double',
     round: 0,
-    type: 0,
+    showType: 0,
+    prefix: fixType.Money,
     group: 'Income Merch/Other',
-    label: 'Income merch/other(E\'brite)',
+    label: "Income merch/other(E'brite)",
     async formula(batchData, $QueryFn) {
       // 直接返回用户输入的batch数据
       this.income_merch_other_ebrite = batchData.eventbrite_add_ons;
@@ -485,7 +501,8 @@ const StatisticalTable = {
   income_merch_other_groups: {
     type: 'double',
     round: 0,
-    type: 0,
+    showType: 0,
+    prefix: fixType.Money,
     group: 'Income Merch/Other',
     label: 'Income merch/other(Groups)',
     async formula(batchData, $QueryFn) {
@@ -497,7 +514,8 @@ const StatisticalTable = {
   income_merch_other_none_group_packages: {
     type: 'double',
     round: 0,
-    type: 0,
+    showType: 0,
+    prefix: fixType.Money,
     group: 'Income Merch/Other',
     label: 'Income merch/other(Non-GroupPackages)',
     async formula(batchData, $QueryFn) {
@@ -510,7 +528,8 @@ const StatisticalTable = {
   total_merch_other_income: {
     type: 'double',
     round: 1,
-    type: 2,
+    showType: 2,
+    prefix: fixType.Money,
     group: 'Income Merch/Other',
     label: 'Total Merch/other income',
     async formula(batchData, $QueryFn) {
@@ -525,7 +544,8 @@ const StatisticalTable = {
   per_inc_direct_sales: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Total Income',
     label: '% inc direct sales',
     async formula(batchData, $QueryFn) {
@@ -546,7 +566,8 @@ const StatisticalTable = {
   per_income_groups: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Total Income',
     label: '% inc groups',
     async formula(batchData, $QueryFn) {
@@ -562,7 +583,8 @@ const StatisticalTable = {
   per_income_promos: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Total Income',
     label: '% income promos',
     async formula(batchData, $QueryFn) {
@@ -579,7 +601,8 @@ const StatisticalTable = {
   total_income_tics_merch_other: {
     type: 'double',
     round: 1,
-    type: 2,
+    showType: 2,
+    prefix: fixType.Money,
     group: 'Total Income',
     label: '% Total Income(tics,merch,other)',
     async formula(batchData, $QueryFn) {
@@ -592,7 +615,7 @@ const StatisticalTable = {
   total_adults: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Sales by Ticket Type',
     label: 'Total Adults',
     async formula(batchData, $QueryFn) {
@@ -607,7 +630,7 @@ const StatisticalTable = {
   total_concessions: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Sales by Ticket Type',
     label: 'Total Concessions',
     async formula(batchData, $QueryFn) {
@@ -622,7 +645,7 @@ const StatisticalTable = {
   total_children: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Sales by Ticket Type',
     label: 'Total Children',
     async formula(batchData, $QueryFn) {
@@ -637,7 +660,7 @@ const StatisticalTable = {
   total_family1: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Sales by Ticket Type',
     label: 'Total Family1',
     async formula(batchData, $QueryFn) {
@@ -652,7 +675,7 @@ const StatisticalTable = {
   total_family2: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Sales by Ticket Type',
     label: 'Total Family2',
     async formula(batchData, $QueryFn) {
@@ -667,7 +690,8 @@ const StatisticalTable = {
   inc_audults: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Sales by Ticket Type',
     label: 'Inc Adults',
     async formula(batchData, $QueryFn) {
@@ -682,7 +706,8 @@ const StatisticalTable = {
   inc_concessions: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Sales by Ticket Type',
     label: 'Inc Concessions',
     async formula(batchData, $QueryFn) {
@@ -697,7 +722,8 @@ const StatisticalTable = {
   inc_children: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Sales by Ticket Type',
     label: 'Inc Children',
     async formula(batchData, $QueryFn) {
@@ -712,7 +738,8 @@ const StatisticalTable = {
   inc_family1: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Sales by Ticket Type',
     label: 'Inc Family1',
     async formula(batchData, $QueryFn) {
@@ -727,7 +754,8 @@ const StatisticalTable = {
   inc_family2: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Sales by Ticket Type',
     label: 'Inc Family2',
     async formula(batchData, $QueryFn) {
@@ -742,7 +770,7 @@ const StatisticalTable = {
   early_bird_tics: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Sales by Ticket Tier',
     label: 'Early Bird tics',
     async formula(batchData, $QueryFn) {
@@ -757,7 +785,7 @@ const StatisticalTable = {
   advance_tics: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Sales by Ticket Tier',
     label: 'Advance tics',
     async formula(batchData, $QueryFn) {
@@ -772,7 +800,7 @@ const StatisticalTable = {
   gameday_tics: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Sales by Ticket Tier',
     label: 'Gameday tics',
     async formula(batchData, $QueryFn) {
@@ -787,7 +815,7 @@ const StatisticalTable = {
   other_tics: {
     type: 'int',
     round: 0,
-    type: 2,
+    showType: 2,
     group: 'Sales by Ticket Tier',
     label: 'Other tics',
     async formula(batchData, $QueryFn) {
@@ -802,7 +830,8 @@ const StatisticalTable = {
   ave_tics_per_purchase: {
     type: 'int',
     round: 1,
-    type: 2,
+    showType: 2,
+    prefix: fixType.Money,
     group: 'Sales by Ticket Tier',
     label: 'Ave Tics Per Purchase',
     async formula(batchData, $QueryFn) {
@@ -819,7 +848,8 @@ const StatisticalTable = {
   inc_early_bird: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Sales by Ticket Tier',
     label: 'Inc Early Bird',
     async formula(batchData, $QueryFn) {
@@ -834,7 +864,8 @@ const StatisticalTable = {
   inc_advance: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Sales by Ticket Tier',
     label: 'Inc Advance',
     async formula(batchData, $QueryFn) {
@@ -849,7 +880,8 @@ const StatisticalTable = {
   inc_gameday: {
     type: 'double',
     round: 0,
-    type: 1,
+    showType: 1,
+    prefix: fixType.Money,
     group: 'Sales by Ticket Tier',
     label: 'Inc Gameday',
     async formula(batchData, $QueryFn) {
@@ -864,7 +896,8 @@ const StatisticalTable = {
   inc_other: {
     type: 'double',
     round: 0,
-    type: 2,
+    showType: 2,
+    prefix: fixType.Money,
     group: 'Sales by Ticket Tier',
     label: 'Inc Other',
     async formula(batchData, $QueryFn) {
@@ -879,7 +912,8 @@ const StatisticalTable = {
   ave_pound_per_purchase: {
     type: 'double',
     round: 1,
-    type: 1,
+    showType: 1,
+    suffix: fixType.Percentage,
     group: 'Sales by Ticket Tier',
     label: 'Ave £ per purchase',
     async formula(batchData, $QueryFn) {
@@ -896,7 +930,7 @@ const StatisticalTable = {
   '1st_timers_this_season': {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Customer Analysis',
     label: '1st timers this season',
     async formula(batchData, $QueryFn) {
@@ -939,7 +973,7 @@ const StatisticalTable = {
   '2nd_timers_this_season': {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Customer Analysis',
     label: '2nd timers this season',
     async formula(batchData, $QueryFn) {
@@ -982,7 +1016,7 @@ const StatisticalTable = {
   '1st_timers_ever': {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Customer Analysis',
     label: '1st timers ever',
     async formula(batchData, $QueryFn) {
@@ -1016,7 +1050,7 @@ const StatisticalTable = {
   '2nd_timers_ever': {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Customer Analysis',
     label: '2nd timers ever',
     async formula(batchData, $QueryFn) {
@@ -1051,7 +1085,7 @@ const StatisticalTable = {
   total_paying_accounts: {
     type: 'int',
     round: 0,
-    type: 1,
+    showType: 1,
     group: 'Customer Analysis',
     label: 'Total Paying Accounts',
     async formula(batchData, $QueryFn) {
@@ -1065,7 +1099,8 @@ const StatisticalTable = {
   per_1st_timers_this_season: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Customer Analysis',
     label: '% 1st timers this season',
     async formula(batchData, $QueryFn) {
@@ -1078,7 +1113,8 @@ const StatisticalTable = {
   per_2nd_timers_this_season: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Customer Analysis',
     label: '% 2nd timers this season',
     async formula(batchData, $QueryFn) {
@@ -1091,7 +1127,8 @@ const StatisticalTable = {
   per_1st_timers_ever: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Customer Analysis',
     label: '% 1st timers ever',
     async formula(batchData, $QueryFn) {
@@ -1104,7 +1141,8 @@ const StatisticalTable = {
   per_2nd_timers_ever: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
+    suffix: fixType.Percentage,
     group: 'Customer Analysis',
     label: '% 2nd timers ever',
     async formula(batchData, $QueryFn) {
@@ -1117,7 +1155,7 @@ const StatisticalTable = {
   lr_promotions: {
     type: 'varchar',
     round: 1,
-    type: 2,
+    showType: 2,
     group: 'Customer Analysis',
     label: '% 2nd timers ever',
     async formula(batchData, $QueryFn) {
@@ -1165,4 +1203,4 @@ exports.columnMapper = columnMapper;
 exports.reverseCol = reverseCol;
 exports.COL_import_batch = COL_import_batch;
 exports.StatisticalTable = StatisticalTable;
-exports.DetailGroup = DetailGroup
+exports.DetailGroup = DetailGroup;

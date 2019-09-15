@@ -2,7 +2,11 @@
 
 const XLSX = require('xlsx');
 const Service = require('egg').Service;
-const { columnMapper, reverseCol, COL_import_batch } = require('../utils/mapping');
+const {
+  columnMapper,
+  reverseCol,
+  COL_import_batch,
+} = require('../utils/mapping');
 const moment = require('moment');
 
 class AnalyserService extends Service {
@@ -18,7 +22,11 @@ class AnalyserService extends Service {
       }
       v.push(value);
     });
-    const sql = `INSERT INTO import_batch (${c.join(',')},import_time) VALUES (${v.join(',')},'${moment().format('YYYY-MM-DD HH:mm:ss')}')`;
+    const sql = `INSERT INTO import_batch (${c.join(
+      ','
+    )},import_time) VALUES (${v.join(',')},'${moment().format(
+      'YYYY-MM-DD HH:mm:ss'
+    )}')`;
     await this.app.mysql.query(sql);
   }
   // 使用流获取buffer数组
@@ -110,8 +118,8 @@ class AnalyserService extends Service {
       pageNum,
       batchs,
     } = this.ctx.request.body;
-    const select = `SELECT * FROM ticket_xls WHERE order_date BETWEEN '${startTime}' and '${endTime}'`;
-    const selectCount = `SELECT count(*) AS CNT FROM ticket_xls WHERE order_date BETWEEN '${startTime}' and '${endTime}'`;
+    const select = `SELECT * FROM import_batch WHERE game_date BETWEEN '${startTime}' and '${endTime}'`;
+    const selectCount = `SELECT count(*) AS CNT FROM import_batch WHERE game_date BETWEEN '${startTime}' and '${endTime}'`;
     const batch =
       batchs.length > 0 ? ` and batch IN ('${batchs.join("','")}')` : '';
     const limit = ` limit ${(pageNum - 1) * pageSize},${pageSize}`;
@@ -126,22 +134,30 @@ class AnalyserService extends Service {
     const column = [];
     if (data.length > 0) {
       // 循环第一列获取表头
+      // Object.keys(data[0]).forEach(key => {
+      //   if (key in reverseCol) {
+      //     column.push({
+      //       title: reverseCol[key].key,
+      //       dataIndex: key,
+      //       width: 'min-content',
+      //     });
+      //   }
+      // });
       Object.keys(data[0]).forEach(key => {
-        if (key in reverseCol) {
-          column.push({
-            title: reverseCol[key].key,
-            dataIndex: key,
-            width: 'min-content',
-          });
-        }
+        column.push({
+          title: key,
+          dataIndex: key,
+          width: 'min-content',
+        });
       });
     }
     return column;
   }
   async getBatchs() {
-    return await this.app.mysql.query('SELECT batch FROM ticket_xls GROUP BY batch');
+    return await this.app.mysql.query(
+      'SELECT batch FROM ticket_xls GROUP BY batch'
+    );
   }
-
 }
 
 module.exports = AnalyserService;

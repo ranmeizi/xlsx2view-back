@@ -24,5 +24,10 @@ module.exports = app => {
   // 获取图表数据
   router.post('/statistics/getChartData', controller.statistics.getChartData);
   // cuntomer 单场比赛统计图数据
-  router.post('/statistics/getSingleField', controller.statistics.getSingleField);
+  router.post(
+    '/statistics/getSingleField',
+    controller.statistics.getSingleField
+  );
+  // 删除接口
+  router.post('/result/deleteBatch', controller.analyser.deleteBatch);
 };
