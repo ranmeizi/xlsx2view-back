@@ -30,4 +30,7 @@ module.exports = app => {
   );
   // 删除接口
   router.post('/result/deleteBatch', controller.analyser.deleteBatch);
+
+  //测试上传哦
+  router.post('/heiheihei/hahaha',controller.test.upload)
 };
